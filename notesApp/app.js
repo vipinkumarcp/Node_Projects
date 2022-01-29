@@ -3,6 +3,7 @@
 //to call module  and stored in variable
 const fs = require('fs')
 const yargs = require('yargs')
+const notes = require('./notes.js')
 
 // const chalk = require('chalk')
 
@@ -61,15 +62,29 @@ yargs.version('1.1.0')
 
 //create add command
 yargs.command({
-
     //command name
     command: 'add',
     describe: 'Add a new note',
+    builder: {
+        title: {
+            describe: 'title of note',
+            //default value to need to be passed
+            demandOption: true,
+            //supported type
+            type: 'string',
+        },
+        body: {
+            describe: 'body of note',
+            //default value to need to be passed
+            demandOption: true,
+            //supported type
+            type: 'string',
+        },
+    },
     //function to run
-    handler: function () {
-        console.log('Adding note')
+    handler: function (argv) {
+        notes.addNote(argv.title, argv.body)
     }
-
 })
 
 //create remove command
@@ -87,25 +102,9 @@ yargs.command({
     command: 'list',
     describe: 'listing the note',
     //property which command to suppoert
-    builder: {
-        title: {
-            describe: 'title of note',
-            //default value to need to be passed
-            demandOption: true,
-            //supported type
-            type: 'string',
-        },
-        body: {
-            describe: 'body of note',
-            //default value to need to be passed
-            demandOption: true,
-            //supported type
-            type: 'string',
-        }
-    },
-
-    handler: function(argv) {
-        console.log('Title '+argv.title + 'body '+argv.body)
+    handler: function() {
+        console.log('listing a note')
+        
     }
 })
 
