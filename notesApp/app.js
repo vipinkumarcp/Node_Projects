@@ -92,8 +92,15 @@ yargs.command({
 yargs.command({
     command: 'remove',
     describe: 'Remove a note',
-    handler: function () {
-        console.log('Removing note')
+    builder:{
+        title:{
+            describe: 'Note title',
+            demandOption: true,
+            type: 'string',
+        }
+    },
+    handler: function (argv) {
+        notes.removeNote(argv.title)
     }
 })
 
@@ -101,20 +108,27 @@ yargs.command({
 yargs.command({
     command: 'list',
     describe: 'listing the note',
-    //property which command to suppoert
+    //property which command to support
     handler: function() {
-        console.log('listing a note')
-        
-    }
+        notes.listNotes()
+    },
 })
 
 //create read command
 yargs.command({
     command: 'read',
     describe: 'read the note',
-    handler: function() {
-        console.log('read the note')
-    }
+    builder: {
+        title: {
+            describe: 'title of note',
+            //default value to need to be passed
+            demandOption: true,
+            //supported type
+            type: 'string',
+        }},
+    handler:  function (argv)  {
+        notes.readNotes(argv.title)
+    },
 })
 
 // console.log(yargs.argv)
