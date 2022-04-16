@@ -34,6 +34,8 @@ router.post('/users/login',async (req,res)=>{
     try{
         const user = await User.findByCredentials(req.body.email,req.body.password)
         const token = await user.generateAuthToken()
+        //onemethod to call fgetpublic profile
+        //res.send({user:user.getPublicProfile(),token})
         res.send({user,token})
     }catch(e){
         res.status(400).send(e)
@@ -99,45 +101,34 @@ router.get('/users/me', auth, async (req, res) => {
 })
 //fetching users by id
 
-router.get('/users/:id', async (req, res) => {
 
-    const _id = req.params.id
-
-    try {
-        const user = await User.findById(_id)
-
-        if(!user){
-            return res.status(404).send()
-        }
-
-        res.send(user)
-    }catch(e){
-
-
-        res.status(500).send()
-    }
-
-    //find by id quries
-
-    // User.findById(_id).then((user) => {
-
-    //     //mango db return nothing if no user so using conditional logic
-    //     if (!user) {
-    //         return res.status(404).send()
-    //     }
-
-    //     res.send(user)
-    // }).catch(() => {
-
-    //     res.status(500).send()
-
-    // })
-
-})
+//disablin because users me serves same function
+// router.get('/users/:id', async (req, res) => {
+//     const _id = req.params.id
+//     try {
+//         const user = await User.findById(_id)
+//         if(!user){
+//             return res.status(404).send()
+//         }
+//         res.send(user)
+//     }catch(e){
+//         res.status(500).send()
+//     }
+//     //find by id quries
+//     // User.findById(_id).then((user) => {
+//     //     //mango db return nothing if no user so using conditional logic
+//     //     if (!user) {
+//     //         return res.status(404).send()
+//     //     }
+//     //     res.send(user)
+//     // }).catch(() => {
+//     //     res.status(500).send()
+//     // })
+// })
 
 //updating users by id
 
-router.patch('/users/:id',async (req,res)=>{
+router.patch('/users/me',auth,async (req,res)=>{
     //keys willl return object of the
     const updates = Object.keys(req.body)
     //only which property can be updated
@@ -152,36 +143,41 @@ router.patch('/users/:id',async (req,res)=>{
     try{
 
         //to prevent mongoose direct bypass to prevent database update and middle ware running
-        const user = await User.findByIdAndUpdate(req.params.id)
+        //const user = await User.findByIdAndUpdate(req.params.id)
+
+
 
         updates.forEach((update)=>{
             //acess property dynamically
-            user[update] = req.body[update]
+            req.user[update] = req.body[update]
 
         })
 
-        await user.save()
+        await req.user.save()
 
         //const user = await User.findByIdAndUpdate(req.params.id, req.body,{new:true,runValidators:true})
         //if no users with  id
-        if(!user){
-            return res.status(404).send()
-        }
+        // if(!user){
+        //     return res.status(404).send()
+        // }
         //send updated user data
-        res.send(user)
+        res.send(req.user)
         //server related or validation issue
     }catch(e){
         res.status(400).send(e)
     }
 })
 
-router.delete('/users/:id', async (req, res) => {
+//autentication medileware 
+router.delete('/users/me',auth, async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id)
-        if (!user) {
-            return res.status(404).send()
-        }
-        res.send(user)
+        // const user = await User.findByIdAndDelete(req.user.__id)
+        // if (!user) {
+        //     return res.status(404).send()
+        // }
+        //using remove method mangoose 
+        await req.user.remove()
+        res.send(req.user)
     } catch (e) {
         res.status(500).send()
     }

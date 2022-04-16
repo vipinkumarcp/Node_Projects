@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs/dist/bcrypt')
 const mongoose = require('mongoose')
 const validator = require('validator')
 const jwt = require('jsonwebtoken')
+const Task= require('./task')
 
 
 
@@ -51,8 +52,53 @@ const userSchema = new mongoose.Schema({
             required:true
         }
 
-    }]
+    }],
+    
 })
+
+
+//virutal property-relationship b/w two entities task and users
+//way to mangoose to figure out how these things related
+
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
+
+
+
+// to remove uncessary data returning to user
+// userSchema.methods.getPublicProfile = function(){
+//     const user = this
+
+//     //to object is mangoose method to return raw data
+//     const userObject = user.toObject()
+
+//     //delete doesn't want 
+//     delete userObject.password
+//     delete userObject.tokens
+
+//     return userObject
+// }
+
+//another automated task for above mentioned method by toJSNON method.no need to call this method automatially get applied
+//json called evey time when express request is called..
+
+userSchema.methods.toJSON= function(){
+    const user = this
+
+    //to object is mangoose method to return raw data
+    const userObject = user.toObject()
+
+    //delete doesn't want 
+    delete userObject.password
+    delete userObject.tokens
+
+    return userObject
+}
+
 
 
 
@@ -68,13 +114,6 @@ userSchema.methods.generateAuthToken = async function(){
 
     return token
 }
-
-
-
-
-
-
-
 
 
 
@@ -123,7 +162,13 @@ userSchema.pre('save',async function(next){
 
     
 })
+//middileware to delet task if user deleted
 
+userSchema.pre('remove',async function(next){
+    const user = this
+    await Task.deleteMany({owner:user._id})
+    next()
+})
 
 const User = mongoose.model('User', userSchema)
 
