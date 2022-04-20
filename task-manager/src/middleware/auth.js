@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+require('dotenv').config()
 
 const auth = async (req,res,next)=>{
 
@@ -7,7 +8,7 @@ const auth = async (req,res,next)=>{
 
         //removing bearer part with replace method
         const token = req.header('Authorization').replace('Bearer ', '')
-        const decoded = jwt.verify(token,'thisismynewcourse')
+        const decoded = jwt.verify(token,process.env.JWT_SECRET)
         const user = await User.findOne({ _id: decoded._id, 'tokens.token': token })
 
         
