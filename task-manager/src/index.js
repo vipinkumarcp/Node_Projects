@@ -5,23 +5,45 @@ const Task = require('./models/task')
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
 
-
+//regex101.com
 const app = express()
 
 const port = process.env.PORT || 3000
-//middleware-function run before request send to route
 
-// new-request -> do something ->run route handler
-// app.use((req,res,next)=>{
-//  console.log(req.method,req.path)
+// const multer = require('multer')
+// const upload = multer({
 
+//     dest:'images',
+//     limits:{
+//         fileSize:1000000
+//     },
+//     fileFilter(req,file,cb){
+//         //if not pdf  reject
+//         //  //match allow us to check regualr expression in forward slashes
+//         if(!file.originalname.match(/\.(doc|docx)/)){
 
-//  //to next thread
-//  next()
+//             return cb(new Error('File must be word'))
+//         }
+//         //first arg  is error
+//         cb(undefined,true)
+//         //cb is call back-if something got wrong 
+//         // cb(new Error('File must be a PDF'))
+//         // //if everything went well
+//         // cb(undefined,true)
+//         // cb(undefined,false)
+//     }
 
 // })
 
-//automatical parse incoming json
+// //middleware upload is name
+// app.post('/upload',upload.single('upload'),(req,res)=>{
+//     res.send()
+// },//if any error came this express setup
+// (error,req,res,next)=>{
+//     res.status(400).send({error: error.message})
+// })
+
+
 app.use(express.json())
 
 //registering user router
@@ -39,14 +61,3 @@ app.listen(port, () => {
 
 
 
-// const main = async () => {
-//     const task = await Task.findById('625a725e1d09634ba3d77e5f')
-//     await task.populate('owner')
-//     console.log(task.owner)
-
-// //     // const user = await User.findById('')
-// //     // await user.populate('tasks').execPopulate()
-// //     // console.log(user.tasks)
-// }
-
-// main()

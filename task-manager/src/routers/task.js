@@ -26,10 +26,40 @@ router.post('/tasks',auth, async (req, res) => {
     }
 })
 
+
+
+// GET /tasks?completed=true
+// GET /tasks?limit=10&skip=20
+// GET /tasks?sortBy=createdAt:desc
 router.get('/tasks',auth, async (req, res) => {
+
+    //to fetch query string value
+    const match = {}
+    // -1 for desc and 1 for asc
+    const sort = {}
+    if (req.query.completed){
+        match.completed = req.query.completed === 'true'
+    }
+    if (req.query.sortBy){
+        //spliting special character
+        const parts = req.query.sortBy.split(':')
+        //grabing first item in parts array
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+    }
+
     try{
         //const tasks = await Task.find({owner:req.user._id})
-        await req.user.populate('tasks')
+        //await req.user.populate('tasks')
+        await req.user.populate({
+            path:'tasks',
+            match,
+            options:{
+                //ignored when no number is provided
+                limit:parseInt(req.query.limit),
+                skip:parseInt(req.query.skip),
+                sort
+            }
+        })
         res.send(req.user.tasks)
 
     }catch(e){
